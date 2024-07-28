@@ -1,0 +1,121 @@
+/* General Styles */
+body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    background-color: #2F4F4F;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Slicer Container */
+.slicer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.slicer-container label {
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.slicer-container select {
+    padding: 5px;
+    margin-right: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Table Name */
+.tablename {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Chart Container */
+.chart-container {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #f9f9fb;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h3 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.canvas-container {
+    width: 100%;
+    height: 400px;
+    position: relative;
+}
+
+/* Real-Time Sales Data */
+.chart-container p {
+    font-size: 18px;
+    color: #555;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.chart-container p span {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Low Stock Alerts */
+#lowStockAlerts {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+#lowStockAlerts p {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #ffdddd;
+    border: 1px solid #ffcccc;
+    border-radius: 4px;
+    color: #d00;
+    font-weight: bold;
+}
+
+/* Reorder Points */
+#reorderPoints {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+#reorderPoints p {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #ddffdd;
+    border: 1px solid #ccffcc;
+    border-radius: 4px;
+    color: #0d0;
+    font-weight: bold;
+}

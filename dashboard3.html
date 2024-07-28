@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script> 
+    
+    
+
+<!-- Include Moment.js adapter -->
+    <link rel="stylesheet" href="dashboard2.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="tablename">Dashboard</h2>
+        <!-- Slicers -->
+
+
+        <div class="slicer-container">
+        <select id="yearSlicer"></select>
+        <select id="quarterSlicer"></select>
+        <select id="monthSlicer"></select>
+        </div>
+
+
+        <!-- Sales Dashboard -->
+        <div class="chart-container">
+            <h3>Real-Time Sales Data</h3>
+            <p>Total Sales: <span id="totalSales"></span></p>
+            <p>Number of Transactions: <span id="numTransactions"></span></p>
+            <p>Average Transaction Value: <span id="avgTransactionValue"></span></p>
+        </div>
+
+        <div class="chart-container">
+            <h3>Top-Selling Products</h3>
+            <div class="canvas-container">
+                <canvas id="topSellingProductsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Sales Trends</h3>
+            <div class="canvas-container">
+                <canvas id="salesTrendsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Inventory Management -->
+        <div class="chart-container">
+            <h3>Current Inventory Levels</h3>
+            <div class="canvas-container">
+                <canvas id="inventoryLevelsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Low Stock Alerts</h3>
+            <ul id="lowStockAlerts"></ul>
+        </div>
+        <div class="chart-container">
+            <h3>Demand Forecasting</h3>
+            <div class="canvas-container">
+                <canvas id="demandForecastingChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Stock Movement</h3>
+            <div class="canvas-container">
+                <canvas id="stockMovementChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-container">
+            <h3>Total Revenue Per Product</h3>
+            <div class="canvas-container">
+                <canvas id="revenuePerProductChart"></canvas>
+            </div>
+        </div>
+        <!-- Forecasting -->
+        <div class="chart-container">
+            <h3>Pareto</h3>
+            <div class="canvas-container">
+                <canvas id="paretoChart"></canvas>
+            </div>
+        </div>
+
+        
+
+        <div class="chart-container">
+            <h3>Reorder Point Calculation</h3>
+            <ul id="reorderPoints"></ul>
+        </div>
+
+        <!-- Customer Insights -->
+        <div class="chart-container">
+            <h3>Customer Purchase History</h3>
+            <div class="canvas-container">
+                <canvas id="customerPurchaseHistoryChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Loyalty Program Data</h3>
+            <div class="canvas-container">
+                <canvas id="loyaltyProgramChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Financial Metrics -->
+        <div class="chart-container">
+            <h3>Revenue and Profit Margins</h3>
+            <div class="canvas-container">
+                <canvas id="revenueProfitMarginsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Cost of Goods Sold (COGS)</h3>
+            <div class="canvas-container">
+                <canvas id="cogsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Existing Charts -->
+        
+
+        <div class="chart-container">
+            <h3>Most Sold Items</h3>
+            <div class="canvas-container">
+                <canvas id="mostSoldItemsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Total Items Sold Per Quarter</h3>
+            <div class="canvas-container">
+                <canvas id="totalItemsSoldQuarterChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Total Items Sold Per Year</h3>
+            <div class="canvas-container">
+                <canvas id="totalItemsSoldYearChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Total Items Sold Per Month</h3>
+            <div class="canvas-container">
+                <canvas id="totalItemsSoldMonthChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Revenue Yearly Per Product</h3>
+            <div class="canvas-container">
+                <canvas id="revenueYearlyPerProductChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Revenue by Payment Method</h3>
+            <div class="canvas-container">
+                <canvas id="paymentMethodRevenueChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Inventory Status</h3>
+            <div class="canvas-container">
+                <canvas id="inventoryStatusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Items About to Stock Out</h3>
+            <div class="canvas-container">
+                <canvas id="stockOutItemsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard4.js "></script>
+</body>
+</html>

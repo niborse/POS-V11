@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="signin.css">
+</head>
+<body>
+
+    <div class="signin">
+    
+        <div class="signin-container">
+            <img src="nblogosignin.jpg" alt="Logo" class="logo">
+
+            <h1>Sign In</h1>
+            <p1>If you want to store your data in localStorage.</p1>
+            <form id="signin-form-1">
+                <div class="form-group">
+                    <input type="text" id="username-1" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password-1" placeholder="Password" required>
+                </div>
+                <button type="submit">Sign In</button>
+                
+                <p>New customers, please complete the form, and we'll reach out to you soon!</p>
+            </form>
+        
+        </div>
+        <div class="signin-container1">
+            <img src="nblogosignin.jpg" alt="Logo" class="logo">
+
+            <h1>Sign In</h1>
+            <p1>If you want to store your data in MangoDB storage.</p1>
+            <form id="signin-form-2">
+                <div class="form-group">
+                    <input type="text" id="username-2" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password-2" placeholder="Password" required>
+                </div>
+                <button type="submit">Sign In</button>
+                
+                <p>New customers, please complete the form, and we'll reach out to you soon!</p>
+            </form>
+        
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signin-form-1').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username-1').value;
+            const password = document.getElementById('password-1').value;
+
+            // Simple authentication logic (replace with real authentication in production)
+            if (username === 'niborse' && password === 'pass') {
+                window.location.href = 'possystem.html';
+            } else {
+                alert('Invalid username or password');
+            }
+        });
+
+        document.getElementById('signin-form-2').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username-2').value;
+            const password = document.getElementById('password-2').value;
+
+            // Simple authentication logic (replace with real authentication in production)
+            if (username === 'niborse1812' && password === 'pass1812') {
+                window.location.href = 'possystem1.html';
+            } else {
+                alert('Invalid username or password');
+            }
+        });
+    </script>
+
+    <div class="form-container">
+        <h2>Enquiry</h2>
+        <p>Help our client to reimagine ways of working with technology.</p>
+        <form action="https://api.web3forms.com/submit" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="access_key" value="f5310b8d-2816-4f21-909e-b3b8b1484c88">
+                <input type="text" name="name" placeholder="Name*" required>
+                <input type="email" name="email" placeholder="Email*" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="organization" placeholder="Organization*" required>
+                <input type="tel" name="contact" placeholder="Contact Number*" required>
+            </div>
+            <div class="form-group">
+                <select name="region" required>
+                    <option value="" disabled selected>Region*</option>
+                    <option value="north_america">North America</option>
+                    <option value="south_america">South America</option>
+                    <option value="europe">Europe</option>
+                    <option value="asia">Asia</option>
+                    <option value="africa">Africa</option>
+                    <option value="australia">Australia</option>
+                </select>
+                <select name="inquiry" required>
+                    <option value="" disabled selected>Inquiry Type*</option>
+                    <option value="general">General</option>
+                    <option value="technical">Technical</option>
+                    <option value="sales">Sales</option>
+                </select>
+            </div>
+            <textarea name="message" placeholder="Message"></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+</body>
+</html>

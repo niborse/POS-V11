@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Product Entry</title>
+    <link rel="stylesheet" href="newproduct.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>New Product Entry</h1>
+        <form id="productForm">
+            <label for="class">Class:</label>
+            <input type="text" id="class" name="class" required>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="price">Price:</label>
+            <input type="number" step="0.01" id="price" name="price" required>
+
+            <label for="barcode">Barcode:</label>
+            <input type="text" id="barcode" name="barcode" required>
+
+            <label for="margin">Margin (%):</label>
+            <input type="number" step="0.01" id="margin" name="margin" required>
+
+            <label for="profit">Profit:</label>
+            <input type="number" step="0.01" id="profit" name="profit" required>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <script src="newproduct.js"></script>
+</body>
+</html>

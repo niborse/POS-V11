@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> NB Supply Chain </title>
+    <link rel="stylesheet" href="index.css"> <!-- Include your CSS file here -->
+    
+    
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+          <div class="nav-left">
+            <img src="nblogoupdate.jpg">
+            <ul>
+              <li><a href="website.html">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Contact Us</a></li>
+              <li class="dropdown" onmouseover="showDropdown()" onmouseout="hideDropdown()">
+                <a href="#services">Services</a>
+                <ul class="dropdown-content" id="servicesDropdown">
+
+                    <li><a href="signin.html">POS</a></li>  
+                  <li><a href="warehouse.html"">Warehouse</a></li>
+                  <li><a href="warehouse.html">Transportation</a></li>
+                  <li><a href="warehouse.html">Inventory</a></li>
+                  
+                  <!-- Add more services as needed -->
+                </ul>
+
+              </li>
+              <li > <a href="signin.html"> Why don't you try our new POS service</a></li>
+            </ul>
+          </div>
+          <div class="nav-right">
+            <li class="search-bar">
+              <input type="text" placeholder="Search">
+            </li>
+          </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section id="home">
+            <h2>Welcome to our website</h2>
+            
+        </section>
+
+
+        <div class="intro">
+            <h1 class="intro-text">Make Errorless Supply Chain with NB Supply Chain Solution business</h1>
+        
+            <p class="aim">To maximize the value of your supply chain & integrated your supply chain dots.</p>
+
+        </div>
+        
+
+        
+
+        <section id="about">
+            <h2>About Us</h2>
+            <p>
+                We are working for all sector companies to help them to manage their inventory, storage, and transportation of raw material, unfinished products, and finished products. We provide warehouse, transportation, and value-added services. For instance, we only focus on our new advanced technology of POS system. In this fast paced world, we helping our client to reduced the time of transaction and purchased entry, also give them insights of sales trends and real-time inventory. 
+            </p>
+        <section id="mission">
+                <h2>Our Mission</h2>
+                <p>
+                    Our mission is to empower businesses by providing them with the tools they need to monitor their performance and optimize their operations. We strive to offer a user-friendly platform that brings together all critical business data in one place, enabling businesses to track sales trends, manage inventory levels, and enhance their overall productivity.
+                </p>
+        </section>
+    
+        <section id="vision">
+                <h2>Our Vision</h2>
+                <p>
+                    We envision a world where businesses have access to seamless and efficient data management tools that drive growth and success. Our goal is to be the leading provider of sales and inventory management solutions, helping businesses unlock their full potential through data-driven insights and innovation.
+                </p>
+            <!-- Your about page content goes here -->
+        </section>
+
+        <section id="services">
+            <h2>Our Services</h2>
+            <ul class="services-list">
+                <li><a href="warehouse.html">Warehouse</a></li>
+                <li><a href="warehouse.html">Transportation</a></li>
+                <li><a href="warehouse.html">Inventory</a></li>
+                <li><a href="signin.html">POS</a></li>
+            </ul>
+        </section>
+    </main>
+    <script>
+        function showDropdown() {
+            var dropdownContent = document.getElementById("servicesDropdown");
+            dropdownContent.style.display = "block";
+        }
+
+        function hideDropdown() {
+            var dropdownContent = document.getElementById("servicesDropdown");
+            dropdownContent.style.display = "none";
+        }
+        // JavaScript for slide-in effect
+        document.addEventListener("DOMContentLoaded", function () {
+            const slideInElements = document.querySelectorAll(".slide-in");
+
+            const appearOnScroll = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    } else {
+                        entry.target.classList.add("appear");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: "0px 0px -100px 0px"
+            });
+
+            slideInElements.forEach(element => {
+                appearOnScroll.observe(element);
+            });
+        });
+    
+        
+    </script>
+
+    
+</body>
+</html>

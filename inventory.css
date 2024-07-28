@@ -1,0 +1,102 @@
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background-color: #2F4F4F; 
+}
+
+.tablename {
+    color: #333;
+}
+
+.container {
+    padding: 20px;
+    background-color: #fff; /* White background for the container */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    max-width: 1200px; /* Max width for larger screens */
+    margin: 40px auto; /* Center the container */
+}
+
+h2 {
+    text-align: center;
+    margin-top: 20px;
+    color: #444; /* Slightly darker heading color */
+    font-size: 24px; /* Larger heading font size */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff; /* White background for the table */
+    color: #333; /* Darker text color */
+    border-radius: 8px; /* Rounded corners for the table */
+    overflow: hidden; /* Prevent overflow of rounded corners */
+}
+
+table, th, td {
+    border: 1px solid #ddd; /* Light gray borders */
+}
+
+th, td {
+    padding: 12px; /* Slightly larger padding */
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4; /* Slightly darker background for headers */
+    color: #333; /* Darker text color for headers */
+    font-weight: bold;
+}
+
+td {
+    background-color: #fafafa; /* Very light gray for table cells */
+}
+
+button {
+    display: inline-block;
+    margin: 10px 5px; /* Space around buttons */
+    padding: 10px 20px; /* Padding for buttons */
+    background-color: #2F4F4F; /* Blue background color */
+    color: #fff; /* White text color */
+    border: none;
+    border-radius: 4px; /* Rounded corners for buttons */
+    cursor: pointer;
+    font-size: 16px; /* Larger font size */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+button:hover {
+    background-color: black; /* Darker blue on hover */
+}
+
+button:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Custom focus outline */
+}
+/* Add this CSS style to your existing stylesheet */
+.low-stock {
+    background-color: #8B0000; /* Dark red background for low stock rows */
+    color: #fff; /* White text color for low stock rows */
+}
+.no-stock {
+    background-color: red;
+    color: white;
+}
+
+.low-stock {
+    background-color: yellow;
+    color: black;
+}
+
+.medium-stock {
+    background-color: orange;
+    color: white;
+}
+
+.high-stock {
+    background-color: green;
+    color: white;
+}

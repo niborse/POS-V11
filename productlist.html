@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products</title>
+    <link rel="stylesheet" href="manage-products.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+        crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Manage Products</h2>
+        <form id="productForm">
+            <input type="text" id="productName" placeholder="Product Name" required>
+            <input type="number" step="0.01" id="productPrice" placeholder="Product Price" required>
+            <input type="number" id="productBarcode" placeholder="Product Barcode" required>
+            <button type="submit">Add/Update Product</button>
+        </form>
+        <ul id="productList"></ul>
+    </div>
+
+    <script>
+        const productList = {};
+
+        document.getElementById('productForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const name = document.getElementById('productName').value.trim();
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const barcode = document.getElementById('productBarcode').value.trim();
+
+            if (name && price && barcode) {
+                productList[name] = { price, barcode };
+                updateProductList();
+                saveProductList();
+            } else {
+                alert('Please fill all fields');
+            }
+        });
+
+        function updateProductList() {
+            const listElement = document.getElementById('productList');
+            listElement.innerHTML = '';
+            for (const [name, details] of Object.entries(productList)) {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${name} - ₹${details.price} - Barcode: ${details.barcode}`;
+                listElement.appendChild(listItem);
+            }
+        }
+
+        function saveProductList() {
+            fetch('http://192.168.0.103:5009/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(productList)
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Products saved successfully');
+                } else {
+                    console.error('Error saving products:', response.statusText);
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function loadProductList() {
+            fetch('http://192.168.0.103:5009/products')
+                .then(response => response.json())
+                .then(data => {
+                    Object.assign(productList, data);
+                    updateProductList();
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProductList);
+    </script>
+</body>
+</html>

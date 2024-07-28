@@ -1,0 +1,112 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+body.loading:before {
+    content: "Start scanning your items...";
+    color: white;
+    text-align: left;
+    padding-left: 10px;
+    width: 50%;
+    position: absolute;
+    top: 20px;
+    font-size: 3em;
+    font-weight: bold;
+    z-index: 100;
+}
+
+.container {
+    display: flex;
+    height: 100%;
+}
+
+.camera-window {
+    flex: 1;
+    background-color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 50%;
+}
+
+.camera-window video {
+    width: 100%;
+    height: auto;
+}
+
+.camera-window canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.purchase-system {
+    width: 50%;
+    background-color: #2F4F4F;
+    color: white;
+    padding: 30px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.purchase-system h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+#detectedItems {
+    margin-bottom: 20px;
+}
+
+#purchaseItemsList {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align detected items to the left */
+    gap: 10px; /* Add spacing between items */
+    width: 100%;
+}
+
+#purchaseItemsList > div {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+input[type="number"],
+input[type="date"] {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100px;
+}
+
+.actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.actions button {
+    padding: 10px 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+.actions button:hover {
+    background-color: #778899;
+}
+

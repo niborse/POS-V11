@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory</title>
+    <link rel="stylesheet" href="inventory.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="tablename">Inventory</h2>
+        <button id="editButton">Edit Manually</button>
+        <button id="saveButton" style="display:none;">Save</button>
+        <button id="addRowButton" style="display:none;">Add New Item</button>
+        <button id="downloadButton">Download Data</button>
+        <li><a href="inventoryemail.html">Stock alert to owner</a></li>
+
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Best Before Date</th>
+                    <th>Total Stock Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Inventory items will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    
+    <script>
+        // Item prices
+        const itemPrices = {
+            "Apple-Royal-Gala": 2.5,
+            "Banana": 1.5,
+            "Bread-Hovis": 1,
+            "Bread-Warburtons": 1.2,
+            "Melon": 1.2,
+            "Milk-Arla-gravendale-whole-milk": 2.45,
+            "Milkybar": 0.3,
+            "Walkers-Salt-and-Vinegar": 1.5,
+            "orange": 2.3
+        };
+
+        // Function to determine status based on quantity
+        function getStatus(quantity) {
+            if (quantity === 0) {
+                return "No Stock";
+            } else if (quantity <= 5) {
+                return "Low";
+            } else if (quantity <= 20) {
+                return "Medium";
+            } else {
+                return "High";
+            }
+        }
+        function sendEmailNotification(itemName, quantity) {
+            var jsonData = JSON.stringify({
+                item: itemName,
+                quantity: quantity,
+                status: getStatus(quantity)
+            });
+
+            $.ajax({
+                url: 'http://localhost:3002/send-email', // Ensure this matches your backend server endpoint
+                type: 'POST',
+                contentType: 'application/json',
+                data: jsonData,
+                success: function(response) {
+                    console.log('Email sent successfully:', response);
+                },
+                error: function(error) {
+                    console.log('Error sending email:', error);
+                }
+            });
+        }
+
+
+
+        // Function to load inventory from localStorage
+        function loadInventory() {
+            const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+            const inventoryTableBody = document.getElementById('inventoryTable').getElementsByTagName('tbody')[0];
+
+            // Clear the table body
+            inventoryTableBody.innerHTML = '';
+
+            // Populate the table with inventory items
+            inventory.forEach(item => {
+                const row = document.createElement('tr');
+
+                const itemNameCell = document.createElement('td');
+                itemNameCell.textContent = item.class;
+
+                const quantityCell = document.createElement('td');
+                quantityCell.textContent = item.quantity;
+
+                const bestBeforeDateCell = document.createElement('td');
+                bestBeforeDateCell.textContent = item.bestBefore;
+
+                // Calculate total stock amount
+                const totalStockAmount = item.quantity * (itemPrices[item.class] || 0);
+
+                const totalStockAmountCell = document.createElement('td');
+                totalStockAmountCell.textContent = totalStockAmount.toFixed(2);
+
+                // Determine status
+                const statusCell = document.createElement('td');
+                const status = getStatus(item.quantity);
+                statusCell.textContent = status;
+                // Check for low stock and send email notification
+                if (status === 'Low' || status === 'No Stock') {
+                    sendEmailNotification(item.class, item.quantity);
+                }
+
+                row.appendChild(itemNameCell);
+                row.appendChild(quantityCell);
+                row.appendChild(bestBeforeDateCell);
+                row.appendChild(totalStockAmountCell);
+                row.appendChild(statusCell);
+
+                inventoryTableBody.appendChild(row);
+            });
+
+            // Initialize DataTable
+            $('#inventoryTable').DataTable();
+        }
+
+        // Make table editable
+        function makeTableEditable() {
+            $('#inventoryTable').DataTable().destroy();
+            const cells = document.querySelectorAll('#inventoryTable tbody td');
+            cells.forEach(cell => {
+                cell.setAttribute('contenteditable', true);
+            });
+            document.getElementById('saveButton').style.display = 'inline-block';
+            document.getElementById('addRowButton').style.display = 'inline-block';
+        }
+
+        // Save edited table data to localStorage
+        function saveTableData() {
+            const rows = document.querySelectorAll('#inventoryTable tbody tr');
+            const newInventory = [];
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const item = {
+                    class: cells[0].textContent,
+                    quantity: parseInt(cells[1].textContent),
+                    bestBefore: cells[2].textContent
+                };
+                newInventory.push(item);
+            });
+            localStorage.setItem('inventory', JSON.stringify(newInventory));
+            document.getElementById('saveButton').style.display = 'none';
+            document.getElementById('addRowButton').style.display = 'none';
+            loadInventory();
+        }
+
+        // Add a new row to the table
+        function addNewRow() {
+            const inventoryTableBody = document.getElementById('inventoryTable').getElementsByTagName('tbody')[0];
+            const newRow = document.createElement('tr');
+
+            const itemNameCell = document.createElement('td');
+            itemNameCell.setAttribute('contenteditable', true);
+
+            const quantityCell = document.createElement('td');
+            quantityCell.setAttribute('contenteditable', true);
+
+            const bestBeforeDateCell = document.createElement('td');
+            bestBeforeDateCell.setAttribute('contenteditable', true);
+
+            const totalStockAmountCell = document.createElement('td');
+            totalStockAmountCell.textContent = '0.00';
+
+            const statusCell = document.createElement('td');
+            statusCell.textContent = getStatus(0);
+
+            newRow.appendChild(itemNameCell);
+            newRow.appendChild(quantityCell);
+            newRow.appendChild(bestBeforeDateCell);
+            newRow.appendChild(totalStockAmountCell);
+            newRow.appendChild(statusCell);
+
+            inventoryTableBody.appendChild(newRow);
+        }
+
+        // Download table data as CSV
+        function downloadCSV(csv, filename) {
+            const csvFile = new Blob([csv], { type: 'text/csv' });
+            const downloadLink = document.createElement('a');
+
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = 'none';
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        }
+
+        // Export table data to CSV format
+        function exportTableToCSV(filename) {
+            const rows = document.querySelectorAll('#inventoryTable tr');
+            let csv = [];
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td, th');
+                const rowData = [];
+                cells.forEach(cell => {
+                    rowData.push(cell.textContent);
+                });
+                csv.push(rowData.join(','));
+            });
+
+            downloadCSV(csv.join('\n'), filename);
+        }
+
+        document.getElementById('editButton').addEventListener('click', makeTableEditable);
+        document.getElementById('saveButton').addEventListener('click', saveTableData);
+        document.getElementById('addRowButton').addEventListener('click', addNewRow);
+        document.getElementById('downloadButton').addEventListener('click', () => exportTableToCSV('inventory.csv'));
+
+        // Initialize the inventory page by loading inventory items
+        loadInventory();
+    </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Email Notification</title>
+</head>
+<body>
+    <script>
+        function getStatus(quantity) {
+            if (quantity === 0) {
+                return "No Stock";
+            } else if (quantity <= 5) {
+                return "Low";
+            } else if (quantity <= 20) {
+                return "Medium";
+            } else {
+                return "High";
+            }
+        }
+
+        function sendInventoryToServer() {
+            const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+            fetch('http://localhost:5005/update-inventory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ inventory: inventory })
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            }).then(data => {
+                console.log('Server response:', data);
+            }).catch(error => {
+                console.error('Failed to fetch:', error);
+            });
+        }
+
+        function checkLowStockAndNotify() {
+            const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+            inventory.forEach(item => {
+                const status = getStatus(item.quantity);
+                if (status === 'Low' || status === 'No Stock') {
+                    sendEmailNotification(item.class, item.quantity);
+                }
+            });
+        }
+
+        function sendEmailNotification(itemName, quantity) {
+            var jsonData = JSON.stringify({
+                item: itemName,
+                quantity: quantity,
+                status: getStatus(quantity)
+            });
+
+            console.log('JSON Data:', jsonData);
+
+            fetch('http://localhost:5005/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            }).then(data => {
+                console.log('Email sent successfully:', data);
+            }).catch(error => {
+                console.error('Error sending email:', error);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLowStockAndNotify();
+            sendInventoryToServer();
+        });
+    </script>
+</body>
+</html>
