@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point of Sale System</title>
+    <link rel="stylesheet" href="sale.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"
+        integrity="sha512-90vH1Z83AJY9DmlWa8WkjkV79yfS2n2Oxhsi2dZbIv0nC4E6m5AbH8Nh156kkM7JePmqD6tcZsfad1ueoaovww=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/3.2.0/async.min.js"
+        integrity="sha512-6K6+H87tLdCWvY5ml9ZQXLRlPlDEt8uXmtELhuJRgFyEDv6JvndWHg3jadJuBVGPEhhA2AAt+ROMC2V7EvTIWw=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+</head>
+<body class="loading">
+    <div class="container">
+        <div id="loginModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Login</h3>
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="login()">Login</button>
+            </div>
+        </div>
+        
+        <div class="camera-window">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <div id="mobileCameraModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeMobileCameraModal()">&times;</span>
+                <h3>Scan this QR code with your mobile phone</h3>
+                <div id="qrCode"></div>
+            </div>
+        </div>
+        <div class="pos-system">
+            <h2>Point of Sale System</h2>
+            <div class="camera-selection">
+                <button id="computerCameraButton" onclick="startComputerCamera()">Computer Camera</button>
+                <button id="mobileCameraButton" onclick="startMobileCamera()">Mobile Camera</button>
+                <button id="minimizeButton" class="control-button">◧</button>
+                <button id="maximizeButton" class="control-button">▢</button>
+            </div>
+            <ul id="detectedItems"></ul>
+            <div id="posItemsList"></div>
+            <div class="discount-section">
+                <h3>Apply Discount</h3>
+                <input type="text" id="discountValue" placeholder="Discount Value">
+                <select id="discountType">
+                    <option value="percentage">Percentage</option>
+                    <option value="fixed">Fixed Amount</option>
+                </select>
+                <button onclick="applyDiscount()">Apply Discount</button>
+                <div id="discountAmount" class="discount-amount">0</div>
+            </div>
+            <div id="totalAmount" class="total-amount"></div>
+            <div class="barcode-scanner">
+                <input type="text" id="barcodeInput" placeholder="Scan barcode here" onkeypress="handleBarcodeInput(event)">
+            </div>
+            
+            <div class="payment-methods">
+                <button onclick="handlePaymentAndPrintOptions('Cash')">Cash</button>
+                <button onclick="handlePaymentAndPrintOptions('Card')">Card</button>
+                <button onclick="openManualSearch()">Search Manually</button>
+                <button onclick="clearPOS()">New Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for manual search -->
+    <div id="manualSearchModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeManualSearch()">&times;</span>
+            <input type="text" id="manualSearchInput" oninput="updateSuggestions(this.value)" placeholder="Enter item name">
+            <div id="suggestionList"></div>
+            <button onclick="addManualItem()">Add</button>
+        </div>
+    </div>
+
+    <!-- Modal for print options -->
+    <div id="printOptionsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePrintOptions()">&times;</span>
+            <h3>Select Print Option</h3>
+            <button onclick="printBill('email')">Email</button>
+            <button onclick="printBill('physical')">Physical</button>
+        </div>
+    </div>
+
+    
+    <script>
+        let video, canvas, ctx, detectedItemsList, model, totalAmount, posItemsList;
+        let posItems = []; // Array to store detected items in POS
+        let pricesDisplayed = false; // Flag to track whether prices are displayed
+        let computerCameraStream = null;
+        let mobileCameraStream = null;
+        let fetchInterval; // Variable to hold the interval ID for fetching items
+        let isMobileCameraActive = false; // Flag to track if mobile camera is active
+        let isLoggedIn = false;
+
+        function initializeApp() {
+            if (!isLoggedIn) 
+            return;
+            video = document.getElementById('video');
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            detectedItemsList = document.getElementById('detectedItems');
+            totalAmount = document.getElementById('totalAmount');
+            posItemsList = document.getElementById('posItemsList');
+        
+            loadModel();
+            setupEventListeners();
+        }
+        function setupEventListeners() {
+            const computerCameraButton = document.getElementById('computerCameraButton');
+            const mobileCameraButton = document.getElementById('mobileCameraButton');
+
+            if (computerCameraButton) {
+                computerCameraButton.addEventListener('click', startComputerCamera);
+            }
+            if (mobileCameraButton) {
+                mobileCameraButton.addEventListener('click', startMobileCamera);
+            }
+        }
+
+        function loadModel() {
+            const publishable_key = "rf_641cM6HVqqcEHzEYO7o9rvQdxBI3";
+            const toLoad = {
+                model: "groceries-items",
+                version: 1
+            };
+            roboflow.auth({ publishable_key })
+                .load(toLoad)
+                .then(m => {
+                    model = m;
+                    document.body.classList.remove('loading');
+                })
+                .catch(error => {
+                    console.error('Error loading model:', error);
+                });
+        }
+        
+
+        function startComputerCamera() {
+            stopCamera(); // Stop any active camera first
+            isMobileCameraActive = false; // Set mobile camera flag to false
+            clearInterval(fetchInterval); // Stop fetching items interval
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    computerCameraStream = stream;
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        video.addEventListener('loadeddata', detectFrame); // Wait for video to load
+                    };
+                })
+                .catch(error => {
+                    console.error('Error accessing computer camera:', error);
+                });
+        }
+
+        function startMobileCamera() {
+            stopCamera(); // Stop any active camera first
+            isMobileCameraActive = true; // Set mobile camera flag to true
+            generateQRCode();
+            document.getElementById('mobileCameraModal').style.display = 'block';
+
+            // Start fetching items if mobile camera is active
+            if (isMobileCameraActive) {
+                fetchDetectedItems(); // Initial fetch
+                fetchInterval = setInterval(fetchDetectedItems, 5000); // Start fetching items periodically
+            }
+        }
+        function stopCamera() {
+            if (computerCameraStream) {
+                computerCameraStream.getTracks().forEach(track => track.stop());
+                computerCameraStream = null;
+            }
+            if (mobileCameraStream) {
+                mobileCameraStream.getTracks().forEach(track => track.stop());
+                mobileCameraStream = null;
+            }
+        }
+
+        
+
+        function resizeCanvas() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+        }
+        
+        let lastDetectionTime = 0;
+        const detectionInterval = 100; // Detection every 100ms
+        let noDetectionCount = 0; // Counter to track how long nothing is detected
+        const noDetectionThreshold = 500; // Number of cycles before stopping detection
+
+        async function detectFrame() {
+            const currentTime = Date.now();
+            if (currentTime - lastDetectionTime < detectionInterval) {
+                requestAnimationFrame(detectFrame);
+                return;
+            }
+
+            lastDetectionTime = currentTime;
+
+            // Stop detection if the model is not loaded
+            if (!model) {
+                requestAnimationFrame(detectFrame);
+                return;
+            }
+
+            const predictions = await model.detect(video);
+
+            // Check if predictions are empty
+            if (predictions.length === 0) {
+                noDetectionCount++;
+                console.log('No items detected. Count:', noDetectionCount);
+
+                // Clear the canvas and detected items list if threshold is met
+                if (noDetectionCount >= noDetectionThreshold) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+                    detectedItemsList.innerHTML = ''; // Clear detected items list
+                    console.log('Stopping detection temporarily...');
+                    return; // Stop the loop until something new is detected
+                }
+            } else {
+                noDetectionCount = 0; // Reset counter when items are detected
+
+                // Render predictions and update POS
+                renderPredictions(predictions);
+                console.log('Predictions:', predictions);
+                await storeInPOS(predictions); // Store detected items in POS
+                await updatePosItemsList(); // Update the list of detected items on the screen
+                updateTotalAmount(); // Update the total amount if needed
+            }
+
+            // Continue detection
+            requestAnimationFrame(detectFrame);
+        }
+       
+        async function fetchDetectedItems() {
+            try {
+                const response = await fetch('http://192.168.0.101:8080/items');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch items.');
+                }
+                const items = await response.json();
+
+                const detectedItemsList = document.getElementById('detectedItems');
+                detectedItemsList.innerHTML = '';
+                items.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = item.class;
+                    detectedItemsList.appendChild(listItem);
+                });
+
+                integrateDetectedItems(items); // Assuming this function processes the items further
+            } catch (error) {
+                console.error('Error fetching items:', error);
+            }
+        }
+
+        
+
+        function integrateDetectedItems(items) {
+            items.forEach(item => {
+                if (!posItems.some(posItem => posItem.class === item.class)) {
+                    const itemDetails = getItemDetails(item.class);
+                    posItems.push({
+                        class: item.class,
+                        name: itemDetails.name,
+                        price: itemDetails.price,
+                        quantity: 1
+                    });
+                }
+            });
+
+            updatePosItemsList();
+            updateTotalAmount();
+        }
+
+        function renderPredictions(predictions) {
+    const videoWidth = video.videoWidth; // Original video width
+    const videoHeight = video.videoHeight; // Original video height
+    const canvasWidth = canvas.width; // Canvas width
+    const canvasHeight = canvas.height; // Canvas height
+
+    // Scale ratios for translating video coordinates to canvas
+    const scaleX = canvasWidth / videoWidth;
+    const scaleY = canvasHeight / videoHeight;
+
+    // Clear the canvas and detected items list
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    detectedItemsList.innerHTML = '';
+
+    predictions.forEach(prediction => {
+        const { class: itemClass, bbox, color = 'red', confidence } = prediction;
+
+        if (bbox && typeof bbox.width === 'number' && typeof bbox.height === 'number') {
+            // If bbox uses center-based format, adjust to top-left format
+            const centerX = bbox.x; // Center x-coordinate
+            const centerY = bbox.y; // Center y-coordinate
+            const boxWidth = bbox.width; // Width of the box
+            const boxHeight = bbox.height; // Height of the box
+
+            // Convert center-based format to top-left corner format
+            const x = centerX - boxWidth / 2;
+            const y = centerY - boxHeight / 2;
+
+            // Scale bounding box dimensions to match the canvas
+            const scaledX = x * scaleX;
+            const scaledY = y * scaleY;
+            const scaledWidth = boxWidth * scaleX;
+            const scaledHeight = boxHeight * scaleY;
+
+            // Draw bounding box
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
+
+            // Draw label background
+            const label = `${itemClass} (${(confidence * 100).toFixed(1)}%)`;
+            const textWidth = ctx.measureText(label).width;
+            const textHeight = 16; // Height for 16px font
+            ctx.fillStyle = color;
+            ctx.fillRect(scaledX, scaledY - textHeight - 4, textWidth + 6, textHeight + 4);
+
+            // Draw label text
+            ctx.fillStyle = 'white';
+            ctx.fillText(label, scaledX + 3, scaledY - 8);
+
+            // Add item to the detected items list
+            const listItem = document.createElement('li');
+            listItem.textContent = label;
+            detectedItemsList.appendChild(listItem);
+        } else {
+            console.warn('Invalid bbox:', bbox);
+        }
+    });
+}
+
+
+
+        function generateQRCode() {
+            const qrCodeDiv = document.getElementById('qrCode');
+            qrCodeDiv.innerHTML = '';
+            const qrCodeUrl = 'https://niborse.github.io/for-mobile-testing/'; // Change this to your server address
+            new QRCode(qrCodeDiv, {
+                text: qrCodeUrl,
+                width: 128,
+                height: 128
+            });
+        }
+
+        function closeMobileCameraModal() {
+            document.getElementById('mobileCameraModal').style.display = 'none';
+            stopCamera(); // Stop any active camera
+        }
+        
+
+        
+        async function getItemDetails(itemClass) {
+            try {
+                const response = await fetch(`http://192.168.0.101:3003/items/${itemClass}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const item = await response.json();
+                return item;
+            } catch (error) {
+                console.error('Error fetching item details:', error);
+                return { name: 'Unknown', price: 0, barcode: '' }; // Return default itfem details on error
+            }
+        }
+        async function getItemDetails(barcode) {
+            try {
+                const response = await fetch(`http://192.168.0.101:3003/items/${barcode}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const item = await response.json();
+                return item;
+            } catch (error) {
+                console.error('Error fetching item details:', error);
+                return { name: 'Unknown', price: 0, barcode: '' }; // Return default item details on error
+            }
+        }
+        async function addManualItem() {
+            const searchInput = document.getElementById('manualSearchInput').value;
+            const itemDetails = await getItemDetails(searchInput);
+            addItemToPOS(itemDetails.name);
+            closeManualSearch();
+        }
+        async function handleBarcodeInput(event) {
+    if (event.key === 'Enter') {
+        const barcode = event.target.value.trim();
+        console.log('Barcode input:', barcode); // Debugging log
+        try {
+            const itemDetails = await getItemDetails(barcode);
+            console.log('Fetched item details:', itemDetails); // Debugging log
+            if (itemDetails.name !== 'Unknown') {
+                addItemToPOS(itemDetails);
+            } else {
+                alert('Item not found for barcode: ' + barcode);
+            }
+        } catch (error) {
+            console.error('Error handling barcode input:', error);
+            alert('An error occurred while fetching item details.');
+        }
+        event.target.value = ''; // Clear the input field
+    }
+}
+        async function addItemToPOS(itemClass) {
+            const item = posItems.find(item => item.class === itemClass);
+            if (item) {
+                item.quantity++;
+                
+            } else {
+                getItemDetails(itemClass).then(itemDetails => {
+                    posItems.push({
+                        class: itemClass,
+                        name: itemDetails.name,
+                        price: itemDetails.price,
+                        quantity: 1,
+                        barcode: itemDetails.barcode
+                    });
+                    updatePosItemsList();
+                    updateTotalAmount();
+                });
+            }
+        }
+  
+
+        async function storeInPOS(predictions) {
+            let itemAdded = false; // Flag to check if an item has been added
+
+            for (const prediction of predictions) {
+                const existingItem = posItems.find(item => item.class === prediction.class);
+
+                if (!existingItem) {
+                    const itemDetails = await getItemDetails(prediction.class);
+                    if (itemDetails.name !== 'Unknown') {
+                        posItems.push({
+                            class: prediction.class,
+                            name: itemDetails.name,
+                            price: itemDetails.price,
+                            quantity: 1,
+                            barcode: itemDetails.barcode
+                        });
+
+                        updatePosItemsList();
+                        updateTotalAmount();
+
+                        itemAdded = true; // Mark that an item has been added
+                        break; // Stop processing once an item is added
+                    }
+                }
+            }
+            // If an item was added, wait for a short delay to avoid repeated additions
+            if (itemAdded) {
+                await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 2 seconds
+            }
+            
+        }
+        
+
+        async function updatePosItemsList() {
+            posItemsList.innerHTML = ''; // Clear previous list items
+
+            for (const item of posItems) {
+                const itemDetails = await getItemDetails(item.class);
+
+                const listItem = document.createElement('div');
+
+                const itemNamePriceBarcode = `${itemDetails.name} --------- ₹${(itemDetails.price * item.quantity).toFixed(2)} --------- ${itemDetails.barcode}`;
+                listItem.textContent = itemNamePriceBarcode;
+
+                posItemsList.appendChild(listItem);
+
+                const quantityControls = document.createElement('div');
+                quantityControls.classList.add('quantity-controls');
+
+                const increaseButton = document.createElement('button');
+                increaseButton.textContent = '+';
+                increaseButton.addEventListener('click', function() {
+                    increaseQuantity(item.class);
+                });
+
+                const decreaseButton = document.createElement('button');
+                decreaseButton.textContent = '-';
+                decreaseButton.addEventListener('click', function() {
+                    decreaseQuantity(item.class);
+                });
+
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'x';
+                removeButton.addEventListener('click', function() {
+                    removeItem(item.class);
+                });
+
+                const quantityDisplay = document.createElement('span');
+                quantityDisplay.textContent = item.quantity;
+
+                quantityControls.appendChild(decreaseButton);
+                quantityControls.appendChild(quantityDisplay);
+                quantityControls.appendChild(increaseButton);
+                quantityControls.appendChild(removeButton);
+
+                posItemsList.appendChild(quantityControls);
+            }
+        }
+
+
+
+
+        
+
+
+        function increaseQuantity(itemClass) {
+            const item = posItems.find(item => item.class === itemClass);
+            if (item) {
+                item.quantity++;
+                updatePosItemsList();
+                updateTotalAmount();
+                
+
+            }
+        }
+
+        function decreaseQuantity(itemClass) {
+            const item = posItems.find(item => item.class === itemClass);
+            if (item && item.quantity > 1) {
+                item.quantity--;
+                updatePosItemsList();
+                updateTotalAmount();
+                
+
+            }
+        }
+
+        function removeItem(itemClass) {
+            posItems = posItems.filter(item => item.class !== itemClass);
+            updatePosItemsList();
+            updateTotalAmount();
+            
+
+        }
+        
+        function applyDiscount() {
+            const discountValue = parseFloat(document.getElementById('discountValue').value);
+            const discountType = document.getElementById('discountType').value;
+
+            if (isNaN(discountValue) || discountValue < 0) {
+                alert('Please enter a valid discount value');
+                return;
+            }
+
+            updateTotalAmount(); // Update the total amount to reflect the applied discount
+        }
+        function updateTotalAmount() {
+            const totalPrice = posItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+            const discountValue = parseFloat(document.getElementById('discountValue').value);
+            const discountType = document.getElementById('discountType').value;
+            let discountAmount = 0;
+
+            if (!isNaN(discountValue) && discountValue > 0) {
+                if (discountType === 'percentage') {
+                    if (discountValue <= 100) {
+                        discountAmount = (totalPrice * discountValue) / 100;
+                    }
+                } else if (discountType === 'fixed') {
+                    if (discountValue <= totalPrice) {
+                        discountAmount = discountValue;
+                    }
+                }
+            }
+
+            const finalPrice = totalPrice - discountAmount;
+            totalAmount.textContent = 'Total Price = ₹' + finalPrice.toFixed(2);
+            document.getElementById('discountAmount').textContent = 'Discount Applied: ₹' + discountAmount.toFixed(2);
+        }
+        
+        
+
+        function openManualSearch() {
+            document.getElementById('manualSearchModal').style.display = 'block';
+        }
+
+        function closeManualSearch() {
+            document.getElementById('manualSearchModal').style.display = 'none';
+        }
+
+        function updateSuggestions(searchTerm) {
+            const suggestions = posItems.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            const suggestionList = document.getElementById('suggestionList');
+            suggestionList.innerHTML = '';
+
+            suggestions.forEach(suggestion => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.textContent = suggestion.class;
+                suggestionItem.addEventListener('click', function() {
+                    addItemToPOS(suggestion.class);
+                });
+                suggestionList.appendChild(suggestionItem);
+            });
+        }
+
+        
+
+
+        
+        
+
+        function handlePaymentAndPrintOptions(method) {
+            selectedPaymentMethod = method;
+            openPrintOptions();
+        }
+
+        function printBill(option) {
+            if (option === 'email') {
+                alert('Sending bill via email...');
+            } else if (option === 'physical') {
+                alert('Printing physical bill...');
+            }
+            handlePayment(selectedPaymentMethod);
+            closePrintOptions();
+        }
+
+        function openPrintOptions() {
+            document.getElementById('printOptionsModal').style.display = 'block';
+        }
+
+        function closePrintOptions() {
+            document.getElementById('printOptionsModal').style.display = 'none';
+        }
+
+        let selectedPaymentMethod;
+
+        
+        async function handlePayment(paymentMethod) {
+            console.log('Payment method:', paymentMethod);
+
+            const timestamp = new Date().toISOString();
+            const itemsSold = posItems.map(item => ({
+                itemName: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                totalPrice: item.price * item.quantity
+            }));
+            const sale = {
+                timestamp,
+                paymentMethod,
+                itemsSold,
+                totalAmount: itemsSold.reduce((total, item) => total + item.totalPrice, 0)
+            };
+
+            try {
+                const response = await fetch('http://192.168.0.101:5010/sales', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sale)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Sale added:', result);
+                } else {
+                    console.error('Error adding sale:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+            clearPOS();
+        }
+
+        function clearPOS() {
+            posItems = [];
+            updatePosItemsList();
+            totalAmount.textContent = '₹0.00';
+            pricesDisplayed = false;
+            console.log('POS cleared.');
+            clearInterval(fetchInterval);
+       // Restart detection
+            noDetectionCount = 0; // Reset detection counter
+            console.log('POS cleared. Starting detection for a new customer...');
+            requestAnimationFrame(detectFrame);
+        }
+        fetchDetectedItems();
+        setInterval(fetchDetectedItems, 50000);
+        document.addEventListener('DOMContentLoaded', function () {
+            const posSystem = document.querySelector('.pos-system');
+            const maximizeButton = document.getElementById('maximizeButton');
+            const minimizeButton = document.getElementById('minimizeButton');
+
+            maximizeButton.addEventListener('click', () => {
+                posSystem.classList.add('fullscreen');
+                maximizeButton.style.display = 'none';
+                minimizeButton.style.display = 'inline';
+            });
+
+            minimizeButton.addEventListener('click', () => {
+                posSystem.classList.remove('fullscreen');
+                maximizeButton.style.display = 'inline';
+                minimizeButton.style.display = 'none';
+            });
+        });
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Replace this with actual authentication logic (e.g., check against a database)
+            if (username === 'admin' && password === 'password') {
+                // Successful login
+                isLoggedIn = true;
+                document.getElementById('loginModal').style.display = 'none'; // Hide login modal
+                initializeApp(); // Initialize the POS system
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        document.getElementById('loginModal').style.display = 'block';
+
+    </script>
+</body>
+</html>
