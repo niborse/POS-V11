@@ -174,7 +174,8 @@
             generateQRCode();
             document.getElementById('mobileCameraModal').style.display = 'block';
 
-            // Start fetching items if mobile camera is active
+            
+        }   // Start fetching items if mobile camera is active
             
         function stopCamera() {
             if (computerCameraStream) {
@@ -662,8 +663,7 @@
             console.log('POS cleared. Starting detection for a new customer...');
             requestAnimationFrame(detectFrame);
         }
-        fetchDetectedItems();
-        setInterval(fetchDetectedItems, 50000);
+        
         document.addEventListener('DOMContentLoaded', function () {
             const posSystem = document.querySelector('.pos-system');
             const maximizeButton = document.getElementById('maximizeButton');
