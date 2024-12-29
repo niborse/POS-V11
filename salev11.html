@@ -247,27 +247,7 @@
             requestAnimationFrame(detectFrame);
         }
        
-        async function fetchDetectedItems() {
-            try {
-                const response = await fetch('https://ae0d-150-107-182-52.ngrok-free.app/items');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch items.');
-                }
-                const items = await response.json();
-
-                const detectedItemsList = document.getElementById('detectedItems');
-                detectedItemsList.innerHTML = '';
-                items.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = item.class;
-                    detectedItemsList.appendChild(listItem);
-                });
-
-                integrateDetectedItems(items); // Assuming this function processes the items further
-            } catch (error) {
-                console.error('Error fetching items:', error);
-            }
-        }
+       
 
         
 
@@ -370,7 +350,7 @@
         
         async function getItemDetails(itemClass) {
             try {
-                const response = await fetch(` https://fd8e-150-107-182-52.ngrok-free.app/items/${itemClass}`);
+                const response = await fetch(` http://localhost:3003/items/${itemClass}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
