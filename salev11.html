@@ -381,19 +381,7 @@
                 return { name: 'Unknown', price: 0, barcode: '' }; // Return default itfem details on error
             }
         }
-        async function getItemDetails(barcode) {
-            try {
-                const response = await fetch(`http://192.168.0.101:3003/items/${barcode}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const item = await response.json();
-                return item;
-            } catch (error) {
-                console.error('Error fetching item details:', error);
-                return { name: 'Unknown', price: 0, barcode: '' }; // Return default item details on error
-            }
-        }
+       
         async function addManualItem() {
             const searchInput = document.getElementById('manualSearchInput').value;
             const itemDetails = await getItemDetails(searchInput);
