@@ -175,11 +175,7 @@
             document.getElementById('mobileCameraModal').style.display = 'block';
 
             // Start fetching items if mobile camera is active
-            if (isMobileCameraActive) {
-                fetchDetectedItems(); // Initial fetch
-                fetchInterval = setInterval(fetchDetectedItems, 5000); // Start fetching items periodically
-            }
-        }
+            
         function stopCamera() {
             if (computerCameraStream) {
                 computerCameraStream.getTracks().forEach(track => track.stop());
