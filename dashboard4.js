@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // Fetch sales data from the backend
-        const salesResponse = await fetch('http://localhost:5010/sales');
+        const salesResponse = await fetch('https://mangodb-b3ni.onrender.com/sales');
         if (!salesResponse.ok) {
             throw new Error('Network response was not ok');
         }
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("Retrieved sales data:", salesData);
 
         // Fetch inventory data from the backend
-        const inventoryResponse = await fetch('http://localhost:5010/inventory');
+        const inventoryResponse = await fetch('https://mangodb-b3ni.onrender.com/inventory');
         if (!inventoryResponse.ok) {
             throw new Error('Network response was not ok');
         }
