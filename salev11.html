@@ -174,9 +174,12 @@
             generateQRCode();
             document.getElementById('mobileCameraModal').style.display = 'block';
 
-            
-        }   // Start fetching items if mobile camera is active
-            
+            // Start fetching items if mobile camera is active
+            if (isMobileCameraActive) {
+                fetchDetectedItems(); // Initial fetch
+                fetchInterval = setInterval(fetchDetectedItems, 5000); // Start fetching items periodically
+            }
+        }
         function stopCamera() {
             if (computerCameraStream) {
                 computerCameraStream.getTracks().forEach(track => track.stop());
@@ -244,7 +247,37 @@
             requestAnimationFrame(detectFrame);
         }
        
-       
+        async function fetchDetectedItems() {
+    const detectedItemsList = document.getElementById('detectedItems');
+    detectedItemsList.innerHTML = '<li>Loading...</li>'; // Show a loading message
+
+    try {
+        const response = await fetch('https://server-dq90.onrender.com/items');
+        if (!response.ok) {
+            throw new Error('Failed to fetch items.');
+        }
+        const items = await response.json();
+
+        detectedItemsList.innerHTML = ''; // Clear the loading message
+
+        if (items.length === 0) {
+            detectedItemsList.innerHTML = '<li>No items detected.</li>';
+            return;
+        }
+
+        items.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.textContent = item.class;
+            detectedItemsList.appendChild(listItem);
+        });
+
+        integrateDetectedItems(items); // Further processing
+    } catch (error) {
+        console.error('Error fetching items:', error);
+        detectedItemsList.innerHTML = '<li>Error fetching items. Please try again later.</li>';
+    }
+}
+
 
         
 
@@ -347,7 +380,7 @@
         
         async function getItemDetails(itemClass) {
             try {
-                const response = await fetch(` http://localhost:3003/items/${itemClass}`);
+                const response = await fetch(`https://getitemdetails.onrender.com/items/${itemClass}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -358,7 +391,7 @@
                 return { name: 'Unknown', price: 0, barcode: '' }; // Return default itfem details on error
             }
         }
-       
+        
         async function addManualItem() {
             const searchInput = document.getElementById('manualSearchInput').value;
             const itemDetails = await getItemDetails(searchInput);
@@ -384,58 +417,50 @@
         event.target.value = ''; // Clear the input field
     }
 }
-        async function addItemToPOS(itemClass) {
-            const item = posItems.find(item => item.class === itemClass);
-            if (item) {
-                item.quantity++;
-                
-            } else {
-                getItemDetails(itemClass).then(itemDetails => {
-                    posItems.push({
-                        class: itemClass,
-                        name: itemDetails.name,
-                        price: itemDetails.price,
-                        quantity: 1,
-                        barcode: itemDetails.barcode
-                    });
-                    updatePosItemsList();
-                    updateTotalAmount();
-                });
-            }
-        }
+        
   
+const processedItems = new Set(); // Global or shared across calls
 
-        async function storeInPOS(predictions) {
-            let itemAdded = false; // Flag to check if an item has been added
+async function storeInPOS(predictions) {
+    let itemAdded = false; // Flag to check if an item has been added
 
-            for (const prediction of predictions) {
-                const existingItem = posItems.find(item => item.class === prediction.class);
-
-                if (!existingItem) {
-                    const itemDetails = await getItemDetails(prediction.class);
-                    if (itemDetails.name !== 'Unknown') {
-                        posItems.push({
-                            class: prediction.class,
-                            name: itemDetails.name,
-                            price: itemDetails.price,
-                            quantity: 1,
-                            barcode: itemDetails.barcode
-                        });
-
-                        updatePosItemsList();
-                        updateTotalAmount();
-
-                        itemAdded = true; // Mark that an item has been added
-                        break; // Stop processing once an item is added
-                    }
-                }
-            }
-            // If an item was added, wait for a short delay to avoid repeated additions
-            if (itemAdded) {
-                await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 2 seconds
-            }
-            
+    for (const prediction of predictions) {
+        // Skip if the item is already processed
+        if (processedItems.has(prediction.class)) {
+            continue;
         }
+
+        // Check if the item is already in posItems
+        const existingItem = posItems.find(item => item.class === prediction.class);
+
+        if (!existingItem) {
+            const itemDetails = await getItemDetails(prediction.class);
+            if (itemDetails.name !== 'Unknown') {
+                posItems.push({
+                    class: prediction.class,
+                    name: itemDetails.name,
+                    price: itemDetails.price,
+                    quantity: 1,
+                    barcode: itemDetails.barcode
+                });
+
+                updatePosItemsList();
+                updateTotalAmount();
+
+                // Mark item as processed
+                processedItems.add(prediction.class);
+                itemAdded = true; // Mark that an item has been added
+                break; // Stop processing once an item is added
+            }
+        }
+    }
+
+    // If an item was added, wait for a short delay to avoid repeated additions
+    if (itemAdded) {
+        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 100ms
+    }
+}
+
         
 
         async function updatePosItemsList() {
@@ -630,7 +655,7 @@
             };
 
             try {
-                const response = await fetch('http://192.168.0.101:5010/sales', {
+                const response = await fetch('https://mangodb-b3ni.onrender.com/sales', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -663,7 +688,8 @@
             console.log('POS cleared. Starting detection for a new customer...');
             requestAnimationFrame(detectFrame);
         }
-        
+        fetchDetectedItems();
+        setInterval(fetchDetectedItems, 50000);
         document.addEventListener('DOMContentLoaded', function () {
             const posSystem = document.querySelector('.pos-system');
             const maximizeButton = document.getElementById('maximizeButton');
