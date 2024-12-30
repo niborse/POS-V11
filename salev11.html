@@ -419,48 +419,37 @@
 }
         
   
-const processedItems = new Set(); // Global or shared across calls
+   async function storeInPOS(predictions) {
+            let itemAdded = false; // Flag to check if an item has been added
 
-async function storeInPOS(predictions) {
-    let itemAdded = false; // Flag to check if an item has been added
+            for (const prediction of predictions) {
+                const existingItem = posItems.find(item => item.class === prediction.class);
 
-    for (const prediction of predictions) {
-        // Skip if the item is already processed
-        if (processedItems.has(prediction.class)) {
-            continue;
-        }
+                if (!existingItem) {
+                    const itemDetails = await getItemDetails(prediction.class);
+                    if (itemDetails.name !== 'Unknown') {
+                        posItems.push({
+                            class: prediction.class,
+                            name: itemDetails.name,
+                            price: itemDetails.price,
+                            quantity: 1,
+                            barcode: itemDetails.barcode
+                        });
 
-        // Check if the item is already in posItems
-        const existingItem = posItems.find(item => item.class === prediction.class);
+                        updatePosItemsList();
+                        updateTotalAmount();
 
-        if (!existingItem) {
-            const itemDetails = await getItemDetails(prediction.class);
-            if (itemDetails.name !== 'Unknown') {
-                posItems.push({
-                    class: prediction.class,
-                    name: itemDetails.name,
-                    price: itemDetails.price,
-                    quantity: 1,
-                    barcode: itemDetails.barcode
-                });
-
-                updatePosItemsList();
-                updateTotalAmount();
-
-                // Mark item as processed
-                processedItems.add(prediction.class);
-                itemAdded = true; // Mark that an item has been added
-                break; // Stop processing once an item is added
+                        itemAdded = true; // Mark that an item has been added
+                        break; // Stop processing once an item is added
+                    }
+                }
             }
+            // If an item was added, wait for a short delay to avoid repeated additions
+            if (itemAdded) {
+                await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 2 seconds
+            }
+            
         }
-    }
-
-    // If an item was added, wait for a short delay to avoid repeated additions
-    if (itemAdded) {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 100ms
-    }
-}
-
         
 
         async function updatePosItemsList() {
