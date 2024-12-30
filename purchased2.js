@@ -153,7 +153,7 @@ function saveToInventory() {
             bestBefore: purchasedItem.bestBefore
         };
 
-        const response = await fetch('http://localhost:5010/purchased', {
+        const response = await fetch('https://mangodb-b3ni.onrender.com/purchased', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
