@@ -6,7 +6,7 @@
     <title>POS System Introduction</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        
+        /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -44,7 +44,7 @@
         h1 {
             font-family: 'Press Start 2P', monospace;
             margin-bottom: 20px;
-            font-size: 18px;
+            font-size: 24px;
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
@@ -138,12 +138,22 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            margin-top: 10px;
+            width: 30%;
         }
 
         .modal button:hover {
             background-color: #79bebe;
         }
-
+        #enquiryModal, #guidanceModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
         /* Modal Overlay */
         .modal-overlay {
             display: none;
@@ -155,6 +165,66 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 5;
         }
+        #enquiryModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            color: #333;
+            padding: 30px; /* Increased padding for a spacious look */
+            border-radius: 15px; /* Softer corners */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
+            z-index: 10;
+            text-align: left;
+            width: 95%; /* Wider modal */
+            max-width: 700px; /* Increased maximum width */
+        }
+
+        /* Updated Form Container */
+        #enquiryModal .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Larger gap between fields */
+        }
+
+        /* Updated Form Elements */
+        #enquiryModal form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #enquiryModal form input,
+        #enquiryModal form select,
+        #enquiryModal form textarea,
+        #enquiryModal form button {
+            width: 100%;
+            padding: 20px; /* Increased padding for larger inputs */
+            font-size: 12px; /* Slightly larger font size */
+            border: 1px solid #ccc;
+            border-radius: 10px; /* Softer corners */
+        }
+
+        /* Enhanced Button Styles */
+        #enquiryModal form button {
+            background-color: black;
+            color: #fff;
+            font-size: 16px; /* Larger button text */
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #enquiryModal form button:hover {
+            background-color: #79bebe;
+            transform: scale(1.05); /* Slight enlargement on hover */
+        }
+
+       
     </style>
 </head>
 <body>
@@ -199,22 +269,83 @@ Click on 'Point of Sale' to start selling. The system utilizes a roboflow model 
    At present, the model is trained to detect specific items such as Apple-Royal-Gala, Banana, Bread-Hovis, Bread-Warburtons, Melon, Milk-Arla-Gravendale-Whole-Milk, Milkybar, Walkers-Salt-and-Vinegar, and Orange. MongoDB Atlas is used to retrieve item details detected by the model , "Purchased" for purchase orders, "Dashboard" for analytics, and "Inventory" to manage stock.</p>
         <p><strong>Username:</strong> admin</p>
         <p><strong>Password:</strong> password</p>
+        <p>If you'd like to reach out, click the button below.</p>
+<button onclick="openEnquiryForm()">Reach Out</button>
+
+
+<div class="modal-overlay" id="modalOverlay"></div>
+
+<div class="modal" id="enquiryModal">
+    <div class="EnquiryForm">
+        <h2>Enquiry</h2>
+        
+        <!-- Help our client to reimagine ways of working with technology. -->
+       
+        <p>for more information reach out to us.</p>
+        <form action="https://api.web3forms.com/submit" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="access_key" value="f5310b8d-2816-4f21-909e-b3b8b1484c88">
+                <input type="text" name="name" placeholder="Name*" required>
+                <input type="email" name="email" placeholder="Email*" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="organization" placeholder="Organization*" required>
+                <input type="tel" name="contact" placeholder="Contact Number*" required>
+            </div>
+            <div class="form-group">
+                <select name="region" required>
+                    <option value="" disabled selected>Region*</option>
+                    <option value="north_america">North America</option>
+                    <option value="south_america">South America</option>
+                    <option value="europe">Europe</option>
+                    <option value="asia">Asia</option>
+                    <option value="africa">Africa</option>
+                    <option value="australia">Australia</option>
+                </select>
+                <select name="inquiry" required>
+                    <option value="" disabled selected>Inquiry Type*</option>
+                    <option value="general">General Inquiry</option>
+                    <option value="support">Ask a question</option>
+                    <option value="partnership">About technology</option>
+                </select>
+            </div>
+            <textarea name="message" placeholder="Your Message*" required></textarea>
+            <button type="submit">Submit</button>
+        </form>
+        <button onclick="closeModal()">Close</button>
+    </div>
+</div>
         <button onclick="closeGuidance()">Close</button>
     </div>
-   
+  
     <script>
-        const modal = document.getElementById('guidanceModal');
-        const overlay = document.getElementById('modalOverlay');
-
+        // Open Guidance Modal
         function openGuidance() {
-            modal.style.display = 'block';
-            overlay.style.display = 'block';
+            document.getElementById("guidanceModal").style.display = "block";
+            document.getElementById("modalOverlay").style.display = "block";
         }
-
+     
+        // Open Enquiry Modal
+        function openEnquiryForm() {
+            document.getElementById("enquiryModal").style.display = "block";
+            document.getElementById("modalOverlay").style.display = "block";
+        }
+    // Function to close the Guidance Modal
         function closeGuidance() {
-            modal.style.display = 'none';
-            overlay.style.display = 'none';
+            guidanceModal.style.display = 'none';
+            modalOverlay.style.display = 'none';
         }
+        // Close Modals
+        function closeModal() {
+            document.getElementById("guidanceModal").style.display = "none";
+            document.getElementById("enquiryModal").style.display = "none";
+            document.getElementById("modalOverlay").style.display = "none";
+        }
+    
+        // Close modal when clicking on the overlay
+        document.getElementById("modalOverlay").onclick = closeModal;
     </script>
+    
 </body>
 </html>
+
