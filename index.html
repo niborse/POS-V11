@@ -7,6 +7,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         /* General Reset */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Background color */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3; /* Light color */
+            border-top: 4px solid #3498db; /* Blue color for spinner */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Main content styles */
+        #content {
+            font-family: Arial, sans-serif;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -229,7 +263,9 @@
 </head>
 <body>
     
-
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
     <div class="container">
         <h1>&lt; Welcome to the NB POS System &gt;</h1>
         <div class="options">
@@ -294,65 +330,65 @@ Click on 'Point of Sale' to start selling. The system utilizes a roboflow model 
             </div>
             <div class="form-group">
                 <select name="region" required>
-    <option value="" disabled selected>Region*</option>
-    <!-- Americas -->
-    <option value="north_america">North America</option>
-    <option value="usa">United States</option>
-    <option value="canada">Canada</option>
-    <option value="mexico">Mexico</option>
-    <option value="south_america">South America</option>
-    <option value="brazil">Brazil</option>
-    <option value="argentina">Argentina</option>
-    <option value="chile">Chile</option>
-    <!-- Europe -->
-    <option value="europe">Europe</option>
-    <option value="uk">United Kingdom</option>
-    <option value="germany">Germany</option>
-    <option value="france">France</option>
-    <option value="italy">Italy</option>
-    <option value="spain">Spain</option>
-    <option value="russia">Russia</option>
-    <!-- Asia -->
-    <option value="east_asia">East Asia</option>
-    <option value="china">China</option>
-    <option value="japan">Japan</option>
-    <option value="south_korea">South Korea</option>
-    <option value="taiwan">Taiwan</option>
-    <option value="south_asia">South Asia</option>
-    <option value="india">India</option>
-    <option value="pakistan">Pakistan</option>
-    <option value="bangladesh">Bangladesh</option>
-    <option value="southeast_asia">Southeast Asia</option>
-    <option value="indonesia">Indonesia</option>
-    <option value="philippines">Philippines</option>
-    <option value="vietnam">Vietnam</option>
-    <option value="thailand">Thailand</option>
-    <option value="middle_east">Middle East</option>
-    <option value="uae">United Arab Emirates</option>
-    <option value="saudi_arabia">Saudi Arabia</option>
-    <option value="iran">Iran</option>
-    <option value="israel">Israel</option>
-    <option value="turkey">Turkey</option>
-    <!-- Africa -->
-    <option value="africa">Africa</option>
-    <option value="nigeria">Nigeria</option>
-    <option value="south_africa">South Africa</option>
-    <option value="egypt">Egypt</option>
-    <option value="kenya">Kenya</option>
-    <option value="ethiopia">Ethiopia</option>
-    <!-- Oceania -->
-    <option value="oceania">Oceania</option>
-    <option value="australia">Australia</option>
-    <option value="new_zealand">New Zealand</option>
-    <!-- Additional Regions -->
-    <option value="central_asia">Central Asia</option>
-    <option value="kazakhstan">Kazakhstan</option>
-    <option value="uzbekistan">Uzbekistan</option>
-    <option value="caucasus">Caucasus</option>
-    <option value="georgia">Georgia</option>
-    <option value="azerbaijan">Azerbaijan</option>
-</select>
-
+                    <option value="" disabled selected>Region*</option>
+                    <!-- Americas -->
+                    <option value="north_america">North America</option>
+                    <option value="usa">United States</option>
+                    <option value="canada">Canada</option>
+                    <option value="mexico">Mexico</option>
+                    <option value="south_america">South America</option>
+                    <option value="brazil">Brazil</option>
+                    <option value="argentina">Argentina</option>
+                    <option value="chile">Chile</option>
+                    <!-- Europe -->
+                    <option value="europe">Europe</option>
+                    <option value="uk">United Kingdom</option>
+                    <option value="germany">Germany</option>
+                    <option value="france">France</option>
+                    <option value="italy">Italy</option>
+                    <option value="spain">Spain</option>
+                    <option value="russia">Russia</option>
+                    <!-- Asia -->
+                    <option value="east_asia">East Asia</option>
+                    <option value="china">China</option>
+                    <option value="japan">Japan</option>
+                    <option value="south_korea">South Korea</option>
+                    <option value="taiwan">Taiwan</option>
+                    <option value="south_asia">South Asia</option>
+                    <option value="india">India</option>
+                    <option value="pakistan">Pakistan</option>
+                    <option value="bangladesh">Bangladesh</option>
+                    <option value="southeast_asia">Southeast Asia</option>
+                    <option value="indonesia">Indonesia</option>
+                    <option value="philippines">Philippines</option>
+                    <option value="vietnam">Vietnam</option>
+                    <option value="thailand">Thailand</option>
+                    <option value="middle_east">Middle East</option>
+                    <option value="uae">United Arab Emirates</option>
+                    <option value="saudi_arabia">Saudi Arabia</option>
+                    <option value="iran">Iran</option>
+                    <option value="israel">Israel</option>
+                    <option value="turkey">Turkey</option>
+                    <!-- Africa -->
+                    <option value="africa">Africa</option>
+                    <option value="nigeria">Nigeria</option>
+                    <option value="south_africa">South Africa</option>
+                    <option value="egypt">Egypt</option>
+                    <option value="kenya">Kenya</option>
+                    <option value="ethiopia">Ethiopia</option>
+                    <!-- Oceania -->
+                    <option value="oceania">Oceania</option>
+                    <option value="australia">Australia</option>
+                    <option value="new_zealand">New Zealand</option>
+                    <!-- Additional Regions -->
+                    <option value="central_asia">Central Asia</option>
+                    <option value="kazakhstan">Kazakhstan</option>
+                    <option value="uzbekistan">Uzbekistan</option>
+                    <option value="caucasus">Caucasus</option>
+                    <option value="georgia">Georgia</option>
+                    <option value="azerbaijan">Azerbaijan</option>
+                </select>
+                
                 <select name="inquiry" required>
                     <option value="" disabled selected>Inquiry Type*</option>
                     <option value="general">General Inquiry</option>
@@ -370,6 +406,12 @@ Click on 'Point of Sale' to start selling. The system utilizes a roboflow model 
     </div>
   
     <script>
+        window.addEventListener('load', function() {
+            // Hide the preloader
+            document.getElementById('preloader').style.display = 'none';
+            // Show the main content
+            document.getElementById('content').style.display = 'block';
+        });
         // Open Guidance Modal
         function openGuidance() {
             document.getElementById("guidanceModal").style.display = "block";
