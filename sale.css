@@ -1,314 +1,362 @@
-html, body {
+/* ===== Base Styles ===== */
+:root {
+    --primary-color: #2F4F4F;
+    --secondary-color: #778899;
+    --dark-color: #222;
+    --light-color: #fafafa;
+    --border-color: #ddd;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --text-light: white;
+    --text-dark: #333;
+  }
+  
+  html, body {
     margin: 0;
     padding: 0;
     height: 100%;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-body.loading:before {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
+                "Helvetica Neue", Arial, sans-serif;
+  }
+  
+  /* ===== Loading State ===== */
+  body.loading::before {
     content: "Start scanning your items...";
-    color: white;
+    color: var(--text-light);
     text-align: left;
     padding-left: 10px;
-    width: 50%;
+    width: 100%;
     position: absolute;
     top: 20px;
-    font-size: 3em;
+    font-size: clamp(1.5rem, 5vw, 3rem);
     font-weight: bold;
     z-index: 100;
-}
-
-.container {
+  }
+  
+  /* ===== Layout Structure ===== */
+  .container {
     display: flex;
     height: 100%;
-}
-
-.camera-window {
+  }
+  
+  .camera-window {
     flex: 1;
-    background-color: #222;
+    background-color: var(--dark-color);
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     width: 50%;
-}
-
-.camera-window video {
-    width: 100%;
-    height: auto;
-}
-
-.camera-window canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.pos-system {
+  }
+  
+  .pos-system {
     width: 50%;
-    background-color: #2F4F4F;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--text-light);
     padding: 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    position: relative;
     overflow-y: auto;
-}
-
-.pos-system h2 {
-    display: flex;
-    justify-content: space-between;
-    color: white;
-    width: 100%;
-    padding: 0 0 10px;
-}
-.control-button {
-    padding: 5px 10px;
-    background-color: #2F4F4F;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-}
-
-.control-button:hover {
-    background-color: black;
-}
-.pos-system.fullscreen {
+  }
+  
+  /* ===== Camera Elements ===== */
+  .camera-window video {
+    width: 98%;
+    height: auto;
+    max-height: 100vh;
+  }
+  
+  .camera-window canvas {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 999;
-    overflow: auto;
-}
-
-#detectedItems, #posItemsList {
+    object-fit: contain;
+  }
+  
+  /* ===== POS System Styles ===== */
+  .pos-system h2 {
+    color: var(--text-light);
+    width: 100%;
+    padding: 0 0 10px;
+    margin-top: 0;
+    text-align: center;
+  }
+  
+  .pos-system.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+  }
+  
+  /* ===== Item Lists ===== */
+  #detectedItems, 
+  #posItemsList {
     list-style-type: none;
     padding: 0;
     width: 100%;
-}
-
-#detectedItems li, #posItemsList > div {
-    background-color: #fafafa;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 4px;
+    margin: 10px 0;
+  }
+  
+  #detectedItems li, 
+  #posItemsList > div {
+    background-color: var(--light-color);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #333;
-}
-
-#posItemsList {
-    padding-left: 0;
-}
-
-#posItemsList > div {
-    margin-bottom: 5px;
-}
-
-#posItemsList > div > span {
-    margin-left: auto;
-}
-
-.quantity-controls {
+    color: var(--text-dark);
+    transition: transform 0.2s;
+  }
+  
+  #detectedItems li:hover, 
+  #posItemsList > div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  /* ===== Quantity Controls ===== */
+  .quantity-controls {
     display: flex;
     align-items: center;
-}
-
-.quantity-controls button {
-    margin: 0 5px;
-    padding: 5px 10px;
-    background-color: #2F4F4F;
-    color: white;
+    gap: 5px;
+  }
+  
+  .quantity-controls button {
+    width: 30px;
+    height: 30px;
+    background-color: var(--primary-color);
+    color: var(--text-light);
     border: none;
-    border-radius: 4px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-}
-
-.quantity-controls button:hover {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+  
+  .quantity-controls button:hover {
     background-color: black;
-}
-
-.payment-methods {
+    transform: scale(1.1);
+  }
+  
+  .quantity-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* ===== Buttons ===== */
+  .button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .button-primary {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .button-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+  }
+  
+  .button-danger {
+    background-color: var(--danger-color);
+    color: white;
+  }
+  
+  .button:hover {
+    filter: brightness(90%);
+    transform: translateY(-1px);
+  }
+  
+  .button:active {
+    transform: translateY(0);
+  }
+  
+  /* ===== Payment Section ===== */
+  .payment-methods {
     margin-top: auto;
     display: flex;
     justify-content: center;
-    gap: 10px;
-}
-
-.payment-methods button {
-    padding: 10px 20px;
-    background-color: black;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-.payment-methods button:hover {
-    background-color: #778899;
-}
-
-.payment-methods button:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);
-}
-
-.payment-methods button:last-child {
-    margin-right: 0;
-    background-color: black;
-}
-
-.payment-methods button:last-child:hover {
-    background-color: #778899;
-}
-
-.total-amount {
-    margin-top: auto;
-    color: white;
-    font-size: 18px;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px 0;
+  }
+  
+  .total-amount {
+    margin: 20px 0;
+    color: var(--text-light);
+    font-size: 1.5rem;
     font-weight: bold;
-    
-}
-
-
-.modal {
+    text-align: center;
+    padding: 15px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 8px;
+  }
+  
+  .discount-section {
+    background-color: rgba(0,0,0,0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+  }
+  
+  .discount-section h3 {
+    margin-top: 0;
+    color: var(--text-light);
+  }
+  
+  /* ===== Modal Styles ===== */
+  .modal {
     display: none;
     position: fixed;
     z-index: 1000;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    background-color: #fff;
-    padding: 20px;
-    border: 1px solid #888;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.close {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+  }
+  
+  .modal-content {
+    background-color: var(--light-color);
+    margin: 10% auto;
+    padding: 25px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    color: var(--text-dark);
+  }
+  
+  .close {
     color: #aaa;
-    float: right;
+    position: absolute;
+    right: 20px;
+    top: 10px;
     font-size: 28px;
     font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
     cursor: pointer;
-}
-
-#manualSearchInput {
+  }
+  
+  .close:hover {
+    color: var(--text-dark);
+  }
+  
+  /* ===== Form Elements ===== */
+  input, select {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     box-sizing: border-box;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-#suggestionList div {
-    padding: 10px;
-    background-color: #fafafa;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    margin: 5px 0;
-    border-radius: 4px;
-}
-
-#suggestionList div:hover {
-    background-color: #f1f1f1;
-}
-
-/* New styles for camera selection buttons */
-.camera-selection {
+    font-size: 16px;
+  }
+  
+  input:focus, 
+  select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 79, 79, 0.25);
+  }
+  
+  /* ===== Camera Selection ===== */
+  .camera-selection {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.camera-selection button {
-    padding: 10px 20px;
-    background-color: #2F4F4F;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s, opacity 0.3s;
-}
-
-.camera-selection button:hover {
-    background-color: black;
-}
-
-.camera-selection button.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.show-camera-buttons {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    background-color: #2F4F4F;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-.show-camera-buttons:hover {
-    background-color: #000000;
-}
-@media (max-width: 768px) {
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  
+  /* ===== Responsive Design ===== */
+  @media (max-width: 768px) {
     .container {
-        flex-direction: column;
+      flex-direction: column;
     }
-
-    .camera-window, .pos-system {
-        width: 100%;
-    }
-
+    
+    .camera-window, 
     .pos-system {
-        padding: 10px;
+      width: 100%;
+      height: 50%;
     }
-
-    .total-amount {
-        font-size: 16px;
+    
+    .pos-system {
+      padding: 15px;
     }
-
+    
+    .payment-methods {
+      gap: 10px;
+    }
+    
     .payment-methods button {
-        padding: 8px 16px;
+      padding: 8px 15px;
+      font-size: 14px;
     }
-}
-
+    
+    .modal-content {
+      margin: 20% auto;
+      width: 95%;
+    }
+  }
+  
+  /* ===== Animations ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  /* ===== Print Styles ===== */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    
+    .pos-system, .pos-system * {
+      visibility: visible;
+    }
+    
+    .pos-system {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: auto;
+      background-color: white;
+      color: black;
+    }
+    
+    .payment-methods, 
+    .camera-selection, 
+    .control-button {
+      display: none;
+    }
+  }
