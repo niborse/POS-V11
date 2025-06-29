@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Recognition - New Product Entry</title>
+    <link rel="stylesheet" href="newproduct1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="loginModal" class="modal" style="display:none;">
+        <div class="modal-content">
+          <h2>Login to Submit Products</h2>
+          
+          <div id="emailStep">
+            <input type="email" id="loginEmail" placeholder="Your email">
+            <button id="sendOtpBtn">Send Login Link</button>
+            <div class="or-divider">OR</div>
+            <button id="googleSignInBtn" class="google-signin-btn">
+              <img src="images/googlelogo1.png" alt="Google logo">
+              Sign in with Google
+            </button>
+          </div>
+          <p id="loginError" class="error-message" style="display:none;"></p>
+        </div>
+      </div>
+    <div class="sidebar">
+        <div class="logo">NB System</div>
+        <nav>
+            <ul>
+                <li><a href="salev12.html"><i class="fas fa-cash-register"></i> Point of Sale</a></li>
+                <li class="active"><a href="#"><i class="fas fa-plus-circle"></i> New Product Entry</a></li>
+                <li><a href="purchased1.html"><i class="fas fa-shopping-cart"></i> Purchased</a></li>
+                <li><a href="dashboard3.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="inventoryupdated.html"><i class="fas fa-boxes"></i> Inventory</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>New Product Entry</h1>
+            <div class="user-profile">
+                <span id="userEmailDisplay">Anonymous</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </header>
+
+        <div class="new-product-container">
+            <div class="wizard">
+                <div class="step active" id="step1">
+                    <span>1</span>
+                    <p>Upload Images</p>
+                </div>
+                <div class="step" id="step2">
+                    <span>2</span>
+                    <p>Review & Tag</p>
+                </div>
+                <div class="step" id="step3">
+                    <span>3</span>
+                    <p>Submit Request</p>
+                </div>
+            </div>
+
+            <!-- Step 1: Upload Images -->
+            <div class="step-content active" id="step1-content">
+                <h2>Upload Product Images</h2>
+                <p class="instruction">Please upload multiple images of the new product. Include individual photos and group photos with other items.</p>
+                
+                <div class="upload-area" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & Drop your images here</p>
+                    <p>or</p>
+                    <button class="btn" id="browseBtn">Browse Files</button>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                </div>
+                
+                <div class="preview-grid" id="imagePreview"></div>
+                
+                <div class="action-buttons">
+                    <button class="btn next-btn" id="toStep2" disabled>Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Review & Tag -->
+            <div class="step-content" id="step2-content">
+                <h2>Review & Tag Images</h2>
+                <p class="instruction">Please identify which products are in each image. Add comments to help with training.</p>
+                
+                <div class="tagging-container">
+                    <div class="tagging-sidebar">
+                        <div class="tagging-preview" id="taggingPreview"></div>
+                        <div class="tagging-navigation">
+                            <button class="btn nav-btn" id="prevImage"><i class="fas fa-chevron-left"></i> Previous</button>
+                            <span id="imageCounter">1 of 1</span>
+                            <button class="btn nav-btn" id="nextImage">Next <i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="tagging-form">
+                        <div class="form-group">
+                            <label for="productName">Product Name</label>
+                            <input type="text" id="productName" placeholder="e.g., Apple-Royal-Gala">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="productDescription">Description</label>
+                            <textarea id="productDescription" placeholder="Describe the product (color, size, packaging, etc.)"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="productTags">Tags</label>
+                            <input type="text" id="productTags" placeholder="e.g., fruit, red, sweet">
+                            <small>Separate tags with commas</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="imageComment">Image-specific Notes</label>
+                            <textarea id="imageComment" placeholder="What's special about this image? Which items are visible?"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="btn" id="saveTags">
+                                <i class="fas fa-save"></i> Save Tags
+                            </button>
+                            <span id="saveStatus"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn back-btn" id="backToStep1"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button class="btn next-btn" id="toStep3">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: Submit Request -->
+            <div class="step-content" id="step3-content">
+                <h2>Submit Product Request</h2>
+                <p class="instruction">Review your submission and provide contact information. We'll notify you when the product is ready.</p>
+                
+                <div class="submission-summary">
+                    <h3>Submission Summary</h3>
+                    <div class="summary-grid" id="submissionSummary"></div>
+                </div>
+                
+                <div class="contact-form">
+                    <h3>Contact Information</h3>
+                    <div class="form-group">
+                        <label for="contactName">Your Name</label>
+                        <input type="text" id="contactName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactEmail">Email</label>
+                        <input type="email" id="contactEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactPhone">Phone Number</label>
+                        <input type="tel" id="contactPhone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="additionalNotes">Additional Notes</label>
+                        <textarea id="additionalNotes"></textarea>
+                    </div>
+                </div>
+                <div id="uploadProgress" style="display: none; margin: 10px 0;">
+                    <div>Uploading: <span id="currentFile">-</span></div>
+                    <progress id="uploadProgressBar" value="0" max="100" style="width: 100%"></progress>
+                    <div id="uploadStatus"></div>
+                  </div>
+                <div class="action-buttons">
+                    <button class="btn back-btn" id="backToStep2"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button class="btn submit-btn" id="submitRequest">Submit Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Request Submitted Successfully!</h2>
+            <p>Thank you for your submission. Our team will process your request.</p>
+            <button class="btn" id="modalClose">Add Another Product</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <!-- Firebase SDK (version 9 in compatibility mode) -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+
+<script>
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCsz0E4EDxZW_I28p_y6uIszx4Ozpozykg",
+    authDomain: "nb-pos-dd539.firebaseapp.com",
+    databaseURL: "https://nb-pos-dd539-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "nb-pos-dd539",
+    storageBucket: "nb-pos-dd539.firebasestorage.app",  // Corrected bucket name
+    messagingSenderId: "772363408382",
+    appId: "1:772363408382:web:fd14b141fbb7d474c4e6af"
+  };
+
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+</script>
+    
+    <script src="newproduct4.js"></script>
